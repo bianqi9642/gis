@@ -1,0 +1,55 @@
+---
+title: "homework4"
+output: html_document
+date: "2023-10-24"
+---
+
+Read in global gender inequality data
+
+```{r}
+#read csv
+InequalityData <- read.csv("/Users/qiaoy/Desktop/Geographic Information Systems and Science/wk4/homework/HDR21-22_Composite_indices_complete_time_series.csv", 
+                         sep = ",",  
+                         encoding = "latin1")
+```
+
+creating a new column of difference in inequality between 2010 and 2019
+
+```{r}
+library(dplyr)
+#select column
+InequalityData <- InequalityData %>% 
+  dplyr::select(c(2, "gii_2010":"gii_2019")) %>%
+  mutate(diff_inequality = gii_2010 - gii_2019)
+```
+
+read in spatial data of the World
+
+```{r}
+#read map
+library(sf)
+library(tmap)
+WorldMap <- st_read("/Users/qiaoy/Desktop/Geographic Information Systems and Science/wk4/homework/World_Countries_Generalized/World_Countries_Generalized.shp")
+qtm(WorldMap)
+```
+
+join csv and map
+
+```{r}
+#join csv and map
+InequalityMap <- WorldMap %>%
+  left_join(., 
+            InequalityData,
+            by = c("COUNTRY" = "country"))
+```
+
+mapping
+
+```{r}
+#mapping
+library(tmaptools)
+tmap_mode("plot")
+qtm(InequalityMap, 
+    fill = "diff_inequality")
+```
+
